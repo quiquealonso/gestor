@@ -1,6 +1,7 @@
 package com.example.gestor.controller;
 
 import java.net.URI;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.gestor.memoria.MemoriaProyecto;
 import com.example.gestor.models.Proyecto;
-import com.example.gestor.models.Tarea;
 
 @RestController
 @RequestMapping("/proyectos")
@@ -62,6 +62,13 @@ public ResponseEntity<List<Tarea>> tareasDelProyecto(
     @GetMapping
     public List<Proyecto> lista(
             @RequestParam(name = "activo", required = false) Boolean activo) {
+    private final List<Proyecto> proyectos = new ArrayList<>();
+    private int siguienteId = 1;
+
+
+    @GetMapping
+    public List<Proyecto> lista(
+        @RequestParam(name = "activo", required = false) Boolean activo) {
         if (activo == null) {
             return proyectos;
         }
@@ -86,6 +93,7 @@ public ResponseEntity<List<Tarea>> tareasDelProyecto(
 
     @PostMapping
     public ResponseEntity<Proyecto> crear(@RequestBody Proyecto proyecto) {
+    public Proyecto crear(@RequestBody Proyecto proyecto) {
         proyecto.setId(siguienteId);
         siguienteId = siguienteId + 1;
         proyectos.add(proyecto);
@@ -145,4 +153,24 @@ public ResponseEntity<List<Tarea>> tareasDelProyecto(
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public Proyecto actualizar(
+            @PathVariable(name = "id") int id,
+            @RequestBody Proyecto datos) {
+
+        for (int i = 0; i < proyectos.size(); i++) {
+            if (proyectos.get(i).getId() == id) {
+                datos.setId(id);
+                proyectos.set(i, datos);
+                return datos;
+            }
+        }
+        return null;
+    }
+
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable(name = "id") int id) {
+        proyectos.removeIf(proyecto -> proyecto.getId() == id);
+    }
+    
 }

@@ -6,6 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,6 +45,8 @@ public class TareaController {
 
    
 
+    private int siguienteId = 1;
+
     @GetMapping
     public List<Tarea> lista(
             @RequestParam(name = "completada", required = false) Boolean completada) {
@@ -68,6 +74,8 @@ public class TareaController {
 
     @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<Tarea> crear(@RequestBody Tarea tarea) {
+    @PostMapping
+    public Tarea crear(@RequestBody Tarea tarea) {
         tarea.setId(siguienteId);
         siguienteId = siguienteId + 1;
         tareas.add(tarea);
@@ -126,5 +134,25 @@ public class TareaController {
                 + " / " + tarea.getPrioridad()
                 + " / completada=" + tarea.isCompletada());
         return tarea;
+    }
+
+    @PutMapping("/{id}")
+    public Tarea actualizar(
+            @PathVariable(name = "id") int id,
+            @RequestBody Tarea datos) {
+
+        for (int i = 0; i < tareas.size(); i++) {
+            if (tareas.get(i).getId() == id) {
+                datos.setId(id);
+                tareas.set(i, datos);
+                return datos;
+            }
+        }
+        return null;
+    }
+
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable(name = "id") int id) {
+        tareas.removeIf(tarea -> tarea.getId() == id);
     }
 }
