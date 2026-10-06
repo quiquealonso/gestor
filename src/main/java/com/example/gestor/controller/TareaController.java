@@ -1,8 +1,10 @@
 package com.example.gestor.controller;
 
+import com.example.gestor.dto.TareaRequest;
 import com.example.gestor.dto.TareaResponse;
 import com.example.gestor.models.Tarea;
 import com.example.gestor.memoria.MemoriaProyecto;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,9 +56,15 @@ public class TareaController {
 
     //crear tarea
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<TareaResponse> crear(@RequestBody Tarea tarea) {
+    public ResponseEntity<TareaResponse> crear(@Valid @RequestBody TareaRequest datos) {
+        Tarea tarea = new Tarea();
         tarea.setId(siguienteId);
         siguienteId = siguienteId + 1;
+        tarea.setTitulo(datos.getTitulo());
+        tarea.setPrioridad(datos.getPrioridad());
+        if (datos.getProyectoId() != null) {
+            tarea.setProyectoId(datos.getProyectoId());
+        }
         tareas.add(tarea);
 
         URI ubicacion = ServletUriComponentsBuilder
@@ -71,7 +79,7 @@ public class TareaController {
     @PutMapping("/{id}")
     public ResponseEntity<TareaResponse> actualizar(
             @PathVariable(name = "id") int id,
-            @RequestBody Tarea datos) {
+            @Valid @RequestBody Tarea datos) {
 
         for (int i = 0; i < tareas.size(); i++) {
             if (tareas.get(i).getId() == id) {

@@ -4,7 +4,6 @@ import java.net.URI;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
+import com.example.gestor.dto.ProyectoRequest;
+import com.example.gestor.dto.ProyectoPatchRequest;
 import com.example.gestor.dto.ProyectoResponse;
 import com.example.gestor.memoria.MemoriaProyecto;
 import com.example.gestor.dto.TareaResponse;
@@ -91,9 +93,15 @@ public class ProyectoController {
     }
 
     @PostMapping
-    public ResponseEntity<ProyectoResponse> crear(@RequestBody Proyecto proyecto) {
+    public ResponseEntity<ProyectoResponse> crear(@Valid @RequestBody ProyectoRequest datos) {
+        Proyecto proyecto = new Proyecto();
         proyecto.setId(siguienteId);
         siguienteId = siguienteId + 1;
+        proyecto.setNombre(datos.getNombre());
+        proyecto.setDescripcion(datos.getDescripcion());
+        proyecto.setActivo(Boolean.TRUE.equals(datos.getActivo()));
+        proyecto.setNumeroDeIncidencias(
+                datos.getNumeroDeIncidencias() != null ? datos.getNumeroDeIncidencias() : 0);
         proyectos.add(proyecto);
 
         URI ubicacion = ServletUriComponentsBuilder
@@ -105,15 +113,22 @@ public class ProyectoController {
     }
 
     @PutMapping("/{id}")
-        public ResponseEntity<ProyectoResponse> actualizar(
+    public ResponseEntity<ProyectoResponse> actualizar(
             @PathVariable(name = "id") int id,
-            @RequestBody Proyecto datos) {
+            @Valid @RequestBody ProyectoRequest datos) {
+
+        Proyecto proyecto = new Proyecto();
 
         for (int i = 0; i < proyectos.size(); i++) {
             if (proyectos.get(i).getId() == id) {
-                datos.setId(id);
-                proyectos.set(i, datos);
-                return ResponseEntity.ok(ProyectoResponse.desde(datos));
+                proyecto.setId(id);
+                proyecto.setNombre(datos.getNombre());
+                proyecto.setDescripcion(datos.getDescripcion());
+                proyecto.setActivo(Boolean.TRUE.equals(datos.getActivo()));
+                proyecto.setNumeroDeIncidencias(
+                        datos.getNumeroDeIncidencias() != null ? datos.getNumeroDeIncidencias() : 0);
+                proyectos.set(i, proyecto);
+                return ResponseEntity.ok(ProyectoResponse.desde(proyecto));
             }
         }
         return ResponseEntity.notFound().build();
@@ -122,22 +137,21 @@ public class ProyectoController {
     @PatchMapping("/{id}")
     public ResponseEntity<ProyectoResponse> modificar(
             @PathVariable(name = "id") int id,
-            @RequestBody Map<String, Object> cambios) {
+            @Valid @RequestBody ProyectoPatchRequest cambios) {
 
         for (Proyecto proyecto : proyectos) {
             if (proyecto.getId() == id) {
-                if (cambios.containsKey("nombre")) {
-                    proyecto.setNombre((String) cambios.get("nombre"));
+                if (cambios.getNombre() != null) {
+                    proyecto.setNombre(cambios.getNombre());
                 }
-                if (cambios.containsKey("descripcion")) {
-                    proyecto.setDescripcion((String) cambios.get("descripcion"));
+                if (cambios.getDescripcion() != null) {
+                    proyecto.setDescripcion(cambios.getDescripcion());
                 }
-                if (cambios.containsKey("activo")) {
-                    proyecto.setActivo((Boolean) cambios.get("activo"));
+                if (cambios.getActivo() != null) {
+                    proyecto.setActivo(cambios.getActivo());
                 }
-                if (cambios.containsKey("numeroDeIncidencias")) {
-                    Number numeroDeIncidencias = (Number) cambios.get("numeroDeIncidencias");
-                    proyecto.setNumeroDeIncidencias(numeroDeIncidencias.intValue());
+                if (cambios.getNumeroDeIncidencias() != null) {
+                    proyecto.setNumeroDeIncidencias(cambios.getNumeroDeIncidencias());
                 }
                 return ResponseEntity.ok(ProyectoResponse.desde(proyecto));
             }

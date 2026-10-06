@@ -115,3 +115,15 @@ pm.test("Borrado con 204 y sin cuerpo", function () {
     pm.response.to.have.status(204);
     pm.expect(pm.response.text()).to.equal("");
 });
+
+pm.test("Proyecto POST inválido responde 400", function () {
+    pm.response.to.have.status(400);
+});
+
+pm.test("Proyecto PUT inválido responde 400", function () {
+    pm.response.to.have.status(400);
+});
+
+pm.test("Proyecto PATCH inválido responde 400", function () {
+    pm.response.to.have.status(400);
+});
