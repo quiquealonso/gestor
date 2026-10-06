@@ -1,5 +1,8 @@
 package com.example.gestor.models;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class Tarea {
@@ -9,6 +12,10 @@ public class Tarea {
     private String titulo;
     private String prioridad;
     private boolean completada;
+    private LocalDate vencimiento;       
+    private List<String> etiquetas;        
+    private Responsable responsable;
+    private String notaInterna = "pendiente de revisión interna";
 
     @JsonCreator
     public Tarea() {
@@ -21,6 +28,9 @@ public class Tarea {
         this.completada = completada;
     }
 
+    public String getNotaInterna() {
+    return notaInterna;
+}
     public int getId() {
         return id;
     }
@@ -61,5 +71,23 @@ public class Tarea {
 
     public void setCompletada(boolean completada) {
         this.completada = completada;
+    }
+    public LocalDate getVencimiento() {
+        return vencimiento;
+    }
+    public void setVencimiento(LocalDate vencimiento) {
+        this.vencimiento = vencimiento;
+    }
+    public List<String> getEtiquetas() {
+        return etiquetas;
+    }
+    public void setEtiquetas(List<String> etiquetas) {
+        this.etiquetas = etiquetas;
+    }
+    public Responsable getResponsable() {
+        return responsable; 
+    }
+    public void setResponsable(Responsable responsable) {
+        this.responsable = responsable;
     }
 }
