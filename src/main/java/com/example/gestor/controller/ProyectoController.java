@@ -22,6 +22,8 @@ import jakarta.validation.Valid;
 import com.example.gestor.dto.ProyectoRequest;
 import com.example.gestor.dto.ProyectoPatchRequest;
 import com.example.gestor.dto.ProyectoResponse;
+import com.example.gestor.error.ConflictoException;
+import com.example.gestor.error.RecursoNoEncontradoException;
 import com.example.gestor.memoria.MemoriaProyecto;
 import com.example.gestor.dto.TareaResponse;
 import com.example.gestor.models.Tarea;
@@ -41,6 +43,18 @@ public class ProyectoController {
         this.tareas = memoria.getTareas();
     }
 
+    private boolean existeProyectoConNombre(String nombre) {
+        if (nombre == null) {
+            return false;
+        }
+        for (Proyecto proyecto : proyectos) {
+            if (proyecto.getNombre() != null && proyecto.getNombre().equalsIgnoreCase(nombre.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @GetMapping("/{id}/tareas")
     public ResponseEntity<List<TareaResponse>> tareasDelProyecto(
             @PathVariable(name = "id") int id) {
@@ -52,7 +66,7 @@ public class ProyectoController {
             }
         }
         if (!existe) {
-            return ResponseEntity.notFound().build();
+            throw new RecursoNoEncontradoException("proyecto", id);
         }
 
         List<TareaResponse> resultado = new ArrayList<>();
@@ -89,11 +103,15 @@ public class ProyectoController {
                 return ResponseEntity.ok(ProyectoResponse.desde(proyecto));
             }
         }
-        return ResponseEntity.notFound().build();
+        throw new RecursoNoEncontradoException("proyecto", id);
     }
 
     @PostMapping
     public ResponseEntity<ProyectoResponse> crear(@Valid @RequestBody ProyectoRequest datos) {
+        if (existeProyectoConNombre(datos.getNombre())) {
+            throw new ConflictoException("Ya existe un proyecto con el nombre: " + datos.getNombre());
+        }
+
         Proyecto proyecto = new Proyecto();
         proyecto.setId(siguienteId);
         siguienteId = siguienteId + 1;
@@ -131,7 +149,7 @@ public class ProyectoController {
                 return ResponseEntity.ok(ProyectoResponse.desde(proyecto));
             }
         }
-        return ResponseEntity.notFound().build();
+        throw new RecursoNoEncontradoException("proyecto", id);
     }
 
     @PatchMapping("/{id}")
@@ -156,7 +174,7 @@ public class ProyectoController {
                 return ResponseEntity.ok(ProyectoResponse.desde(proyecto));
             }
         }
-        return ResponseEntity.notFound().build();
+        throw new RecursoNoEncontradoException("proyecto", id);
     }
 
     @DeleteMapping("/{id}")
@@ -178,7 +196,7 @@ public class ProyectoController {
             }
         }
         if (!existe) {
-            return ResponseEntity.notFound().build();
+            throw new RecursoNoEncontradoException("proyecto", id);
         }
 
         tarea.setId(siguienteId);

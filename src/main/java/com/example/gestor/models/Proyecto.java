@@ -1,13 +1,17 @@
 package com.example.gestor.models;
 
+import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class Proyecto {
+
     private int id;
     private String nombre;
     private String descripcion;
     private boolean activo;
     private int numeroDeIncidencias;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
 
     @JsonCreator
     public Proyecto() {
@@ -23,6 +27,19 @@ public class Proyecto {
 
     public int getId() {
         return id;
+    }
+
+    public void setFechaInicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
+    }
+    public void setFechaFin(LocalDate fechaFin) {
+        this.fechaFin = fechaFin;
+    }
+    public LocalDate getFechaFin() {
+        return fechaFin;
     }
 
    
