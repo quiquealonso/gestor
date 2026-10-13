@@ -4,6 +4,7 @@ import com.example.gestor.models.Tarea;
 import java.time.LocalDate;
 import java.util.List;
 
+
 public record TareaResponse(
         int id,
         String titulo,
@@ -25,4 +26,4 @@ public record TareaResponse(
                 tarea.getVencimiento(),
                 ResponsableResponse.desde(tarea.getResponsable()));
     }
-} 
+}
